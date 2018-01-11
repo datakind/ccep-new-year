@@ -321,23 +321,6 @@
       });
     }
 
-
-    // function processGeojson(map) {
-    //   var tract_data = new L.geoJson();
-    //   tract_data.addTo(map);
-
-    //   $.ajax({
-    //     dataType: "json",
-    //     url: "data/sacremento_county_tracts.json",
-    //     success: function(data) {
-    //         $(data.features).each(function(key, data) {
-    //             console.log(data)
-    //             tract_data.addData(data);
-    //         });
-    //     }
-    //     }).error(function() {});
-    // }
-
     function populateNavBarIndicators(){
       $(document).ready(function() {
         $.ajax({
@@ -425,7 +408,6 @@
 
             } else  {
               // Swithiching Layers or Selecting a Layer to Begin With
-
               // Process Data
               lines = processCSV(data)
 
@@ -443,6 +425,8 @@
 
               dataQuants = chloroQuantile(all_vals, 8, 'jenks')
 
+
+              // Leaflet Styling and Things
               function style (feature) {
                   var val = geoid_lookup[+feature.properties['GEOID']];
                   var q_color = getColor(val,dataQuants,bluish)
@@ -474,19 +458,14 @@
 
               function resetHighlight(e) {
                   var layer = e.target;
-
-                  if (2+2 == 5) {
-                      geojsonLayer.resetStyle(e.target);
-                  } else {
-
-                      layer.setStyle({
-                          weight: 1,
-                          color: 'black',
-                          dashArray: '',
-                          fillOpacity: 0.45
-                      });
-                  }
-                  // viz_globals.info.clear();
+        
+                  layer.setStyle({
+                      weight: 1,
+                      color: 'black',
+                      dashArray: '',
+                      fillOpacity: 0.45
+                  });
+                  
               }
 
               function onEachFeature (feature, layer) {
@@ -503,39 +482,10 @@
                 layerManager['choropleth'] = fieldName
 
             }
-
-
-           
           
           }
          });
       });
-
-
-
-            // TODO: best to not define functions inside of other functions unless scoping requires it
-            //       (in which case you might want to just return a function and have a func generator...)
-            function resetHighlight(e) {
-                var layer = e.target;
-
-                if (!_.contains(viz_globals.clickedArray, layer.feature.properties['GEOID'] )) {
-                    geojsonLayer.resetStyle(e.target);
-                } else {
-
-                    layer.setStyle({
-                        weight: 2,
-                        color: 'red',
-                        dashArray: '',
-                        fillOpacity: 0.7
-                    });
-                }
-                viz_globals.info.clear();
-            }
-
-
-
-
-
     }
 
     populateNavBarIndicators()
