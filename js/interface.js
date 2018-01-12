@@ -1,5 +1,4 @@
 function populateNavBarIndicators(){
-  console.log('in populateNavBarIndicators')
   $.ajax({
     type: 'GET',
     url: `data/indicator_menu_fields.csv`,

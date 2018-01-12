@@ -246,7 +246,6 @@ function populateMapWithChoropleth(fieldName) {
 
       // Get the Jenks breaks
       var dataQuants = chloroQuantile(allVals, 4, useJenks=true);
-      console.log(dataQuants)
       // Leaflet Styling and Things
       function generateLeafletStyle(feature) {
         var geoId = Number(feature.properties['GEOID']);
@@ -302,13 +301,11 @@ function populateMapWithChoropleth(fieldName) {
         var div = L.DomUtil.create('div', 'info legend'),
            labels = [];
         var limits = dataQuants;
-        console.log(limits)
 
         if (limits[0] == limits[1]) { 
           console.log('is less')
           limits[0] = 0.0
         }
-        console.log(limits)
         limits = limits.map(function(l) {return l==null ? 0: l});
 
         // // loop through our density intervals and generate a label with a colored square for each interval
