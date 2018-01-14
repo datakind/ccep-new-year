@@ -30,7 +30,7 @@ addCountyToMap(mainMap);
 
 //Adding Legend Stuff
 var legend = L.control({position: 'bottomleft'});
-var point_legend = L.control({position: 'bottomleft'});
+var pointLegend = L.control({position: 'bottomleft'});
 var cleanFields = {
     'dens.cvap.std': 'CVAP Density',
     'dens.work.std': 'Worker Density',

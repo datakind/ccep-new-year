@@ -35,6 +35,7 @@ function clearLayerManager() {
       $('#' + geoJsonLayer.targetCol).removeClass('selected')
       mainMap.removeLayer(geoJsonLayer);
       mainMap.removeControl(legend)
+      mainMap.removeControl(pointLegend);
       layerManager['choropleth'] = null;
     }
   });
@@ -118,8 +119,9 @@ function circleInfoUpdate(e) {
   // do something, like:
   // clickedCircle.bindPopup("some content").openPopup();
   pointClick = clickedCircle;
-  mainMap.removeControl(point_legend);
-  point_legend.addTo(mainMap, e)
+  mainMap.removeControl(pointLegend);
+  pointLegend.addTo(mainMap, e)
+  $(".info.legend.indicatorLegend").insertBefore(".info.legend.pointLegend");
 }
 
 function populateMapWithPoints(fileName) {
@@ -150,23 +152,23 @@ function populateMapWithPoints(fileName) {
         // Now override all the old items in the list (or create a 
         // fresh list entirely)
         layerManager[fileName] = [];
-        
         pointsData[fileName] = {}
+
         processCSV(data).forEach(function(line) {
 
           //Save Line Data to Point Object
           pointsData[fileName][line.ID] = line;
-          // console.log(line)
+
           // Add a new circle shape to the map
           var loc = [line.lat, line.lon]
           var style = styleCircle(fileName, line);
           var circle = L.circle(loc, style).on("click", circleInfoUpdate)
-          // console.log(line.ID)
-          // console.log(fileName)
-          circle.id = [fileName, line.ID]
-          circle.addTo(mainMap);
 
-          // As well as to our layer management object
+          // Add a Unique Identifier to the Point
+          circle.registeredName = [fileName, line.ID]
+
+          // Add to Map and Layer Management
+          circle.addTo(mainMap);
           layerManager[fileName].push(circle);
         });
 
@@ -177,8 +179,8 @@ function populateMapWithPoints(fileName) {
 
 }
 
-point_legend.onAdd = function(map) {
-  var div = L.DomUtil.create('div', 'info legend');
+pointLegend.onAdd = function(map) {
+  var div = L.DomUtil.create('div', 'info legend pointLegend');
   var labels = [];
 
   // IF First Time Loading or No Points Being Shown
@@ -187,8 +189,8 @@ point_legend.onAdd = function(map) {
     return div
   } else {
     console.log(layerManager)
-    var id = pointClick.id[1]
-    var fileName = pointClick.id[0]
+    var id = pointClick.registeredName[1]
+    var fileName = pointClick.registeredName[0]
     console.log('abc', id, fileName)
     var pointData = pointsData[fileName][id]
     console.log(pointData)
@@ -196,19 +198,29 @@ point_legend.onAdd = function(map) {
       'prc.ElNonReg.std','prc.disabled.std','prc.latino.std','prc.nonEngProf.std','prc.pov.std','prc.youth.std',
       'rate.vbm.std','wtd_center_score']
 
-    div.innerHTML += '<h5>Points Data</h5>'
+// <div class="header">
+//   <img src="img/logo.png" alt="logo" />
+//   <h1>My website name</h1>
+// </div>
+
+    div.innerHTML += '<span class="legendHeader"><h5>Points Data </h5> </span>'
     for  (var i = 0; i < fields.length; i++) {
         console.log(fields[i])
          div.innerHTML +=  '<i style="background:' + '' + '">'+(+pointData[fields[i]]).toFixed(2)+'</i>' + cleanFields[fields[i]] ; 
          div.innerHTML += '<br>'
     }
+    div.innerHTML += "<h6 style='color:red'> <a onclick='closePointLegend()'>  Close </a> </h6>"
     return div
     // We have points shown (need to filter out )
 
   }
 }
 
-point_legend.addTo(mainMap)
+pointLegend.addTo(mainMap)
+
+function closePointLegend(){
+  mainMap.removeControl(pointLegend)
+}
 
 // TODO: This code is totally not legible and needs to be refactored
 //       asap - can't a simple lookup dictionary work here?
@@ -385,7 +397,7 @@ function populateMapWithChoropleth(fieldName) {
 
 
       legend.onAdd = function (map) {
-        var div = L.DomUtil.create('div', 'info legend');
+        var div = L.DomUtil.create('div', 'info legend indicatorLegend');
         var labels = [];
 
         // Copy data quants (color bins) over from parent scope
@@ -459,6 +471,8 @@ function populateMapWithChoropleth(fieldName) {
       layerManager['choropleth'] = geoJsonLayer;
       legend.addTo(mainMap);
 
+      // If the Point Legend is in the Chart Be Sure to Insert Before it
+      $(".info.legend.indicatorLegend").insertBefore(".info.legend.pointLegend");
       //Bring Circles to Front if They Are Present
       Object.keys(layerManager).forEach(function(layer) {
         if (layer != 'choropleth') {
