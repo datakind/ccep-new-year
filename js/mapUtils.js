@@ -174,10 +174,21 @@ function populateMapWithPoints(fileName) {
           var loc = [line.lat, line.lon];
           var style = styleCircle(fileName, line);
 
-          // Add a Unique Identifier to the Point
-          var circle = L.circle(loc, style).on("click", circleInfoUpdate);
-          circle.registeredName = [fileName, line.ID];
-          circle.addTo(mainMap);
+
+          // // Do Different Things if POI/Transit vs. Model Points 
+          if (['poi.csv','transit_stops.csv'].indexOf(fileName) === -1 ){
+              // Add a Unique Identifier to the Point and Enable Click Options for the Legend
+              var circle = L.circle(loc, style).on("click", circleInfoUpdate);
+              circle.registeredName = [fileName, line.ID];
+          } else {
+              if (fileName == 'poi.csv') {
+                // Just Add a Popup
+                var popupContent = '<b>Type:</b> ' + toTitleCase(line['fclass']) + '<br>' + '<b>Name</b>: '+ line['name']
+                var circle = L.circle(loc, style).bindPopup(popupContent);
+              } else {
+                var circle = L.circle(loc, style)
+              }
+          }
 
           // Add to Map and Layer Management
           circle.addTo(mainMap);
@@ -200,11 +211,18 @@ function populateMapWithPoints(fileName) {
 
 }
 
+function toTitleCase(str)
+{
+    str = str.replace('_',' ')
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
 function closePointLegend(){
   mainMap.removeControl(pointLegend)
 }
 
 pointLegend.onAdd = function(map) {
+  console.log('in Points')
   var div = L.DomUtil.create('div', 'leafletMapBLBox pointLegend legend');
   var labels = [];
 
@@ -218,6 +236,7 @@ pointLegend.onAdd = function(map) {
   // that else statement that was wrapping this, before, by the way)
   var id = pointClick.registeredName[1]
   var fileName = pointClick.registeredName[0]
+  console.log(fileName)
   var pointData = pointsData[fileName][id]
   var fields = ['dens.cvap.std',
                 'dens.work.std',
@@ -232,13 +251,24 @@ pointLegend.onAdd = function(map) {
                 'rate.vbm.std',
                 'wtd_center_score']
 
+
+  function highMedLowLookupColor(val) {
+    result = val >=  .67  ? ['High','red'] :
+            val >= .33  ? ['Med&nbsp','orange']: ['Low&nbsp','yellow']
+    return result
+  }
+
+
+  
   // First, add the title of the new points data legend
-  div.innerHTML += '<h5>Points Data</h5>'
+  div.innerHTML += '<h5>Points Data (ID:' + pointData['ID'] + ')</h5>'
 
   // Then iterate through the fields and add all the values data
   for  (var i = 0; i < fields.length; i++) {
     var valAsFloat = Number(pointData[fields[i]]).toFixed(2);
-    div.innerHTML += '<i class="leftNumVal">' + valAsFloat + '</i>' +
+    var color =  highMedLowLookupColor(valAsFloat)[1]
+    var label = highMedLowLookupColor(valAsFloat)[0] 
+    div.innerHTML += '<span class="leftNumVal"  style="width:40px;display:inline-block;margin-bottom:2px;background:'+ color + '">&nbsp' + label + '</span>  ' +
                      cleanFields[fields[i]] + '<br>';
   }
 
