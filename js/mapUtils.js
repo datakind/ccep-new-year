@@ -35,14 +35,13 @@ function clearLayerManager() {
       $('#' + geoJsonLayer.targetCol).removeClass('selected')
       mainMap.removeLayer(geoJsonLayer);
       mainMap.removeControl(legend)
-      mainMap.removeControl(pointLegend);
       layerManager['choropleth'] = null;
     }
+
+    // Remove this legend
+    closePointLegend();
   });
 
-  // TODO: couple this with other remove operations of the same class
-  // Finally, and this is gross, remove the circle data legend
-  $('.leafletMapBLBox').remove();
 }
 
 function processCSV(data) {
@@ -123,14 +122,14 @@ function circleInfoUpdate(e) {
   //      e.g.: e.target.bindPopup("some content").openPopup();
 
   pointClick = e.target;
-  mainMap.removeControl(pointLegend);
+  closePointLegend();
   pointLegend.addTo(mainMap, e);
 
-  $(".info.legend.indicatorLegend").insertBefore(".info.legend.pointLegend");
+  $(".leafletMapBLBox.legend.indicatorLegend").insertBefore(".leafletMapBLBox.legend.pointLegend");
 }
 
 function populateMapWithPoints(fileName) {
-  $('.leafletMapBLBox').remove();
+
   // This is a safer way to make sure that the .csv end
   // is not in the name
   var trimmedKey = fileName.replace('.csv', '');
@@ -186,8 +185,19 @@ function populateMapWithPoints(fileName) {
         });
 
     }
+
+    // Finally Check if Any Points Are Currently Active 
+    // If Not - Remove the Point Legend
+    var keys = Object.keys(layerManager);
+    // Choropleth is the only permanent item in layerManager so if len ==1 then no points. 
+    if (keys.length == 1) {
+      closePointLegend()
+      }
+
     }
   });
+
+
 }
 
 function closePointLegend(){
@@ -195,7 +205,7 @@ function closePointLegend(){
 }
 
 pointLegend.onAdd = function(map) {
-  var div = L.DomUtil.create('div', 'leafletMapBLBox legend');
+  var div = L.DomUtil.create('div', 'leafletMapBLBox pointLegend legend');
   var labels = [];
 
   // If it is the first time loading, return nothing; since no
@@ -316,6 +326,7 @@ function populateMapWithChoropleth(fieldName) {
 }
   $('#'+fieldName).toggleClass('selected')
 
+
   var loc = 'data/indicator_files/' + fieldName + '.csv';
   // We need to create a local variable of fieldName to keep and
   // be able to access in the success callback function
@@ -331,12 +342,12 @@ function populateMapWithChoropleth(fieldName) {
       // one that is currently on the map
       if (geoJsonLayer) {
         mainMap.removeLayer(geoJsonLayer);
-        mainMap.removeControl(legend)
         layerManager['choropleth'] = null
 
         // Exit out early if we are clicking on the same
         // item twice in a row
         if (geoJsonLayer.targetCol == targetCol) {
+          mainMap.removeControl(legend)
           return null;
         }
       }
@@ -414,7 +425,7 @@ function populateMapWithChoropleth(fieldName) {
         return div;
       };
 
-      // Add the polygon layers
+      // Polygon Options - Add the polygon layers
       var options = {
         style: function(feature) {
           var geoId = Number(feature.properties['GEOID']);
@@ -443,7 +454,7 @@ function populateMapWithChoropleth(fieldName) {
       legend.addTo(mainMap);
 
       // If the Point Legend is in the Chart Be Sure to Insert Before it
-      $(".info.legend.indicatorLegend").insertBefore(".info.legend.pointLegend");
+      $(".leafletMapBLBox.legend.indicatorLegend").insertBefore(".leafletMapBLBox.legend.pointLegend");
       
       // Move circles up to front should they exist
       Object.keys(layerManager).forEach(function(layer) {
