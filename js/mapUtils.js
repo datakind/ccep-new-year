@@ -261,8 +261,8 @@ pointLegend.onAdd = function(map) {
 
   
   // First, add the title of the new points data legend
-  div.innerHTML += '<h5>Points Data (ID:' + pointData['ID'] + ')</h5>'
-
+  div.innerHTML += '<h5>Suggested Voting Facility (ID:' + pointData['ID'] + ')</h5>'
+  div.innerHTML += '<span><b>' + fileName  + '</b></span><br><br>'
   // Then iterate through the fields and add all the values data
   for  (var i = 0; i < fields.length; i++) {
     var valAsFloat = Number(pointData[fields[i]]).toFixed(2);
