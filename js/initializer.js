@@ -26,29 +26,31 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 }).addTo(mainMap);
 
 // Add geocoding search tool
-mainMap.addControl(new L.Control.Search({
-  sourceData: function(text, callResponse) {
-    geocoder.geocode({address: text}, callResponse);
-  },
+var mobileOpts = {
+  url: 'http://nominatim.openstreetmap.org/search?format=json&q={s}',
+  jsonpParam: 'json_callback',
   formatData: function(rawjson) {
     var json = {}, key, loc, disp = [];
-
     for (var i in rawjson) {
-      key = rawjson[i].formatted_address;
-      var lat = rawjson[i].geometry.location.lat();
-      var lon = rawjson[i].geometry.location.lng();
-      loc = L.latLng(lat, lon);
-      json[key] = loc; // key, value format
+      disp = rawjson[i].display_name.split(',');  
+      key = disp[0] + ', ' + disp[1];
+      loc = L.latLng(rawjson[i].lat, rawjson[i].lon);
+      json[key]= loc;
     }
-
+    
     return json;
-  },
-  markerLocation: true,
+  },   
+  textPlaceholder: 'Search...',
   autoType: false,
-  autoCollapse: true,
-  minLength: 2
-}));
+  tipAutoSubmit: true,
+  autoCollapse: false,
+  autoCollapseTime: 20000,
+  delayType: 800, // with mobile device typing is more slow
+  marker: { icon: true }
+};
 
+mainMap.addControl(new L.Control.Search(mobileOpts));
+mainMap.addControl(new L.Control.Zoom());
 
 // Add the county to the map
 addCountyToMap(mainMap);
