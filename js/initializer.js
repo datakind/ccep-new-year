@@ -25,23 +25,34 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
     accessToken: 'pk.eyJ1Ijoia3VhbmIiLCJhIjoidXdWUVZ2USJ9.qNKXXP6z9_fKA8qrmpOi6Q'
 }).addTo(mainMap);
 
+// Add geocoding search tool
+mainMap.addControl(new L.Control.Search({
+  sourceData: function(text, callResponse) {
+    geocoder.geocode({address: text}, callResponse);
+  },
+  formatData: function(rawjson) {
+    var json = {}, key, loc, disp = [];
+
+    for (var i in rawjson) {
+      key = rawjson[i].formatted_address;
+      var lat = rawjson[i].geometry.location.lat();
+      var lon = rawjson[i].geometry.location.lng();
+      loc = L.latLng(lat, lon);
+      json[key] = loc; // key, value format
+    }
+
+    return json;
+  },
+  markerLocation: true,
+  autoType: false,
+  autoCollapse: true,
+  minLength: 2
+}));
+
+
 // Add the county to the map
 addCountyToMap(mainMap);
 
 // Adding Legend Stuff
 var legend = L.control({position: 'bottomleft'});
 var pointLegend = L.control({position: 'bottomleft'});
-var cleanFields = {
-    'dens.cvap.std': 'CVAP Density',
-    'dens.work.std': 'Worker Density',
-    'popDens.std': 'Population Density',
-    'prc.CarAccess.std': 'Percent Car Access',
-    'prc.ElNonReg.std' : 'Percent Eligible Non Registered',
-    'prc.disabled.std': 'Percent Disabled',
-    'prc.latino.std': 'Percent Latino',
-    'prc.nonEngProf.std':'Percent Non English',
-    'prc.pov.std': 'Percent Poverty',
-    'prc.youth.std': 'Percent Youth',
-    'rate.vbm.std': 'Percent Vote By Mail',
-    'wtd_center_score': 'Weighted Score'
-}
