@@ -46,6 +46,7 @@ var mobileOpts = {
   autoCollapse: false,
   autoCollapseTime: 20000,
   delayType: 800, // with mobile device typing is more slow
+  position: 'topright',
   marker: { icon: true }
 };
 
