@@ -27,7 +27,7 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 
 // Add the county to the map
 addCountyToMap(mainMap);
-
+console.log('in initializer')
 // Adding Legend Stuff
 var legend = L.control({position: 'bottomleft'});
 var pointLegend = L.control({position: 'bottomleft'});
@@ -44,4 +44,11 @@ var cleanFields = {
     'prc.youth.std': 'Percent Youth',
     'rate.vbm.std': 'Percent Vote By Mail',
     'wtd_center_score': 'Weighted Score'
+}
+
+var cleanFiles = {
+  'dropoff_d_centers.csv': 'Ballot Drop Box',
+  'all_test_points.csv': 'All Potential Sites',
+  'three_d_centers.csv'  : '3 Days Prior to Election',
+  'ten_d_centers.csv'    : '10 Days Prior to Election'
 }
