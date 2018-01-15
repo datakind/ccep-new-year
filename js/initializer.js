@@ -27,7 +27,6 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
 
 // Add the county to the map
 addCountyToMap(mainMap);
-console.log('in initializer')
 // Adding Legend Stuff
 var legend = L.control({position: 'bottomleft'});
 var pointLegend = L.control({position: 'bottomleft'});
