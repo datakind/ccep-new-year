@@ -222,7 +222,6 @@ function closePointLegend(){
 }
 
 pointLegend.onAdd = function(map) {
-  console.log('in Points')
   var div = L.DomUtil.create('div', 'leafletMapBLBox pointLegend legend');
   var labels = [];
 
@@ -234,10 +233,9 @@ pointLegend.onAdd = function(map) {
 
   // Once the above check clears, proceed with business as usual (no need for
   // that else statement that was wrapping this, before, by the way)
-  var id = pointClick.registeredName[1]
-  var fileName = pointClick.registeredName[0]
-  console.log(fileName)
-  var pointData = pointsData[fileName][id]
+  var id = pointClick.registeredName[1];
+  var fileName = pointClick.registeredName[0];
+  var pointData = pointsData[fileName][id];
   var fields = ['dens.cvap.std',
                 'dens.work.std',
                 'popDens.std',
@@ -249,8 +247,7 @@ pointLegend.onAdd = function(map) {
                 'prc.pov.std',
                 'prc.youth.std',
                 'rate.vbm.std',
-                'wtd_center_score']
-
+                'wtd_center_score'];
 
   function highMedLowLookupColor(val) {
     result = val >=  .67  ? ['High','red'] :
@@ -258,8 +255,6 @@ pointLegend.onAdd = function(map) {
     return result
   }
 
-
-  
   // First, add the title of the new points data legend
   div.innerHTML += '<h5>Suggested Voting Facility (ID:' + pointData['ID'] + ')</h5>'
   div.innerHTML += '<span><b>' + fileName  + '</b></span><br><br>'
@@ -351,7 +346,7 @@ function populateMapWithChoropleth(fieldName) {
   // Controls for Adding Selection Indicator to the Button
   if (layerManager['choropleth'] != null ) {
     if (layerManager['choropleth']['targetCol'] != fieldName) {
-        $('#'+layerManager['choropleth']['targetCol']).toggleClass('selected')
+      $('#'+layerManager['choropleth']['targetCol']).toggleClass('selected')
   }
 }
   $('#'+fieldName).toggleClass('selected')
