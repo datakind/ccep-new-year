@@ -12,6 +12,7 @@
   crossorigin=""/>
   <link rel="stylesheet" href="css/bootstrap.min.css" />
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/leaflet-search.css" />
 </head>
 
 <body>
@@ -111,7 +112,7 @@
   <div class="col-lg-12 col-sm-12 test">
     
     <a class="navbar-brand" href="http://ccep.ucdavis.edu/">
-      <img src="assets/ccep.png" alt="California Civic Engagement Project (CCEP)">
+      <img src="assets/ccep_logo.png" alt="California Civic Engagement Project (CCEP)">
     </a>
 
     <button class="btn btn-danger pull-right hidden-xs"
@@ -216,21 +217,29 @@
 </div>
 
 <div class="footer">
-<!--   <center>
+  <center>
     <a href="http://www.datakind.org/">
-      <img alt="DataKind"
-           src="/assets/dk_orange.png">
+      DataKind
+      <!-- <img alt="DataKind"
+           src="/assets/dk_orange.png"> -->
     </a>
-  </center> -->
+  </center>
 </div>
 
 <!-- Libraries needed -->
 <script src="js/jquery.min.js"
         type="text/javascript"></script>
+<script src="js/simple_statistics.js"
+        type="text/javascript"></script>
+
+<!-- Leaflet related -->
 <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
         integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
         crossorigin=""></script>
-<script src="js/simple_statistics.js"
+
+<!-- Leaflet geocoding -->
+<script src="https://maps.googleapis.com/maps/api/js?v=3&sensor=false"></script>
+<script src="http://labs.easyblog.it/maps/leaflet-search/dist/leaflet-search.min.js"
         type="text/javascript"></script>
 
 <script type="text/javascript">
@@ -249,10 +258,15 @@
 
 <!-- Global variables -->
 <script type="text/javascript">
-  var mainMap = L.map('leaflet_map').setView([38.576, -121.490], 13);
+  var mainMap = L.map('leaflet_map', {zoomControl: false}).setView([38.576, -121.490], 13);
   var layerManager = { choropleth: null };
   var pointsData = {}
   var pointClick = null;
+  
+  // Instantiate Google geocoder object
+  var geocoder = new google.maps.Geocoder();
+  
+  // Filename data
   var cleanFields = {
     'dens.cvap.std': 'CVAP Density',
     'dens.work.std': 'Worker Density',
@@ -266,14 +280,13 @@
     'prc.youth.std': 'Percent Youth',
     'rate.vbm.std': 'Percent Vote By Mail',
     'wtd_center_score': 'Weighted Score'
-}
-
-var cleanFiles = {
-  'dropoff_d_centers.csv': 'Ballot Drop Box',
-  'all_test_points.csv': 'All Potential Sites',
-  'three_d_centers.csv'  : '3 Days Prior to Election',
-  'ten_d_centers.csv'    : '10 Days Prior to Election'
-}
+  }
+  var cleanFiles = {
+    'dropoff_d_centers.csv': 'Ballot Drop Box',
+    'all_test_points.csv': 'All Potential Sites',
+    'three_d_centers.csv'  : '3 Days Prior to Election',
+    'ten_d_centers.csv'    : '10 Days Prior to Election'
+  }
 </script>
 
 <!-- TODO: This data loading should happen async -->

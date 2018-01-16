@@ -25,6 +25,35 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=p
     accessToken: 'pk.eyJ1Ijoia3VhbmIiLCJhIjoidXdWUVZ2USJ9.qNKXXP6z9_fKA8qrmpOi6Q'
 }).addTo(mainMap);
 
+// Add geocoding search tool
+var mobileOpts = {
+  sourceData: function(text, callResponse) {
+    geocoder.geocode({address: text}, callResponse);
+  },   
+  formatData: function(rawjson) {
+    var json = {}, key, loc, disp = [];
+    for(var i in rawjson) {
+      key = rawjson[i].formatted_address;
+      var lat = rawjson[i].geometry.location.lat();
+      var lng = rawjson[i].geometry.location.lng();
+      loc = L.latLng(lat, lng);
+      json[key]= loc;
+    }
+
+    return json;
+  },
+  markerLocation: true,
+  autoType: false,
+  autoCollapse: true,
+  minLength: 2,
+  delayType: 800, // with mobile device typing is more slow
+  position: 'topright',
+  marker: { icon: true }
+};
+
+mainMap.addControl(new L.Control.Search(mobileOpts));
+mainMap.addControl(new L.Control.Zoom());
+
 // Add the county to the map
 addCountyToMap(mainMap);
 // Adding Legend Stuff
